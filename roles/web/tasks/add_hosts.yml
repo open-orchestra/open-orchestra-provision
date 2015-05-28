@@ -1,0 +1,11 @@
+- name: "Bind localhost"
+  lineinfile:   dest=/etc/hosts 
+                regexp='^{{ hosts_localhost }}$'
+                line="{{ hosts_localhost }}"
+                state=present
+
+- name: "Add sites"
+  lineinfile:   dest=/etc/hosts 
+                regexp='^{{ hosts_site }}$'
+                line="{{ hosts_site }}"
+                state=present
