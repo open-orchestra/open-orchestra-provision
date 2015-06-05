@@ -1,0 +1,7 @@
+---
+  - name: install sendmail-bin
+    apt: pkg=sendmail-bin state=latest
+  - name: install sendmail
+    apt: pkg=sendmail state=latest
+  - name: send mail
+    cron: name="send mail" minute={{mail_minute}} hour={{mail_hour}} job="{{mail_task}}"
