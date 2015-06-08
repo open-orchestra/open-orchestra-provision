@@ -1,5 +1,7 @@
+{% for apache_main_port in apache_main_ports %}
 NameVirtualHost *:{{ apache_main_port }}
 Listen {{ apache_main_port }}
+{% endfor %}
 
 <IfModule mod_ssl.c>
     # If you add NameVirtualHost *:443 here, you will also have to change
