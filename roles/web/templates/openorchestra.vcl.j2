@@ -13,29 +13,23 @@ acl invalidators {
   "127.0.0.1";
 }
 
-backend f1 {
+{% for apache_main_port in apache_main_ports %}
+backend f{{ loop.index }} {
   .host = "127.0.1.1";
   .port = "{{ apache_main_port }}";
 }
-
-backend f2 {
-  .host = "127.0.1.1";
-  .port = "{{ apache_main_port }}";
-}
+{% endfor %}
 
 director front round-robin {
+{% for apache_main_port in apache_main_ports %}
     {
-        .backend = f1;
+        .backend = f{{ loop.index }};
     }
-    {
-        .backend = f2;
-    }
+{% endfor %}
 }
 
 sub vcl_recv {
     set req.backend = front;
-
-    unset req.http.cookie;
 
     if (req.http.Cache-Control ~ "no-cache" && client.ip ~ invalidators) {
         set req.hash_always_miss = true;
