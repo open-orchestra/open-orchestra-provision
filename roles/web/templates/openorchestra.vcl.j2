@@ -105,6 +105,8 @@ sub vcl_recv {
 
     set req.http.Surrogate-Capability = "varnish=ESI/1.0";
 
+    unset req.http.cookie;
+
     return(lookup);
 }
 
@@ -125,6 +127,10 @@ sub vcl_fetch {
     if (beresp.ttl > 0s) {
       unset beresp.http.Set-Cookie;
       return(deliver);
+    }
+
+    if (beresp.ttl > 0s) {
+      unset beresp.http.Set-Cookie;
     }
 }
 
