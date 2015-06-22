@@ -1,20 +1,16 @@
 ---
 sitemap_minute: 0
 sitemap_hour: 2
-sitemap_task: "{{command_php}} {{path_front}}/app/console {{sitemap_command}} 2>> {{error_file}}"
+sitemap_task: '{{command_php}} {{path_front}}/app/console {{sitemap_command}} {{mail_send_command}}'
 sitemap_command: "-e={{env}} orchestra:sitemaps:generate"
 
 robots_minute: 0
 robots_hour: 2
-robots_task: "{{command_php}} {{path_front}}/app/console {{robots_command}} 2>> {{error_file}}"
+robots_task: '{{command_php}} {{path_front}}/app/console {{robots_command}} {{mail_send_command}}'
 robots_command: "-e={{env}} orchestra:robots:generate"
 
-mail_minute: 59
-mail_hour: 0-23
-mail_task: "if [ -s '{{error_file}}' ]; then  cat {{error_file}} | {{sendmail_command}} fi; rm {{error_file}};"
-sendmail_command: mailx -s \"cron error\" {{notification_mail}};
-notification_mail: 'contact@open-orchestra.com'
+mail_send_command: "{{pipe_stderr}} mailx -a '{{mail_from}}' -s '{{mail_subject}}' {{mail_to}};"
+pipe_stderr: '2>&1 1>/dev/null |'
 
 env: prod
 command_php: php
-error_file: /tmp/cron.error.message
