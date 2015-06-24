@@ -1,0 +1,3 @@
+---
+  - name: affect mail to
+    shell: "echo MAILTO={{mail_to}} > {{cron_file}}"
