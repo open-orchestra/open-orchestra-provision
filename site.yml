@@ -5,6 +5,7 @@
     max_clients: 200
   sudo: yes
   roles:
+    - users
     - php
     - web
     - databases
