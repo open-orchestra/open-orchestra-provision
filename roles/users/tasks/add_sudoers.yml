@@ -5,10 +5,9 @@
   tags: sudo
  
 - name: configure sudoers
-  lineinfile: dest=/etc/sudoers.d/deploy owner=root group=root mode=0440
-              line="{{item}} ALL=(root) NOPASSWD:service"
+  lineinfile: dest=/etc/sudoers.d/{{item}} owner=root group=root mode=0440
+              line="{{item}} ALL=(ALL) NOPASSWD:/usr/sbin/service"
               state=present
               create=yes
               validate='visudo -cf %s'
-  with_items:
-    {{sudoers}}
+  with_items: sudoers
