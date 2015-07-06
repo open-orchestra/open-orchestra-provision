@@ -1,0 +1,3 @@
+---
+- name: Jmeter symbolic link
+  file: src={{jmeter_base_dir}}/{{jmeter_name}}/bin/jmeter dest=/usr/bin/jmeter state=link

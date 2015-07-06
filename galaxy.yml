@@ -21,3 +21,6 @@
 
 - src: greendayonfire.mongodb
   version: v1.2.2
+
+- src: alban.andrieu.jmeter
+  version: master
