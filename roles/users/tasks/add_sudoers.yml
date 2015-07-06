@@ -4,9 +4,17 @@
     pkg=sudo state=present update_cache=yes
   tags: sudo
  
-- name: configure sudoers
+- name: add sudoer capacity on Apache
   lineinfile: dest=/etc/sudoers.d/{{item}} owner=root group=root mode=0440
-              line="{{item}} ALL=(ALL) NOPASSWD:/usr/sbin/service"
+              line="{{item}} ALL=(ALL) NOPASSWD:/etc/init.d/apache2"
+              state=present
+              create=yes
+              validate='visudo -cf %s'
+  with_items: sudoers
+
+- name: add sudoer capacity on Varnish
+  lineinfile: dest=/etc/sudoers.d/{{item}} owner=root group=root mode=0440
+              line="{{item}} ALL=(ALL) NOPASSWD:/etc/init.d/varnish"
               state=present
               create=yes
               validate='visudo -cf %s'
