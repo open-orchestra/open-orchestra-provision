@@ -1,15 +1,18 @@
 ---
-- hosts: all
-  vars:
-    http_port: 80
-    max_clients: 200
+- hosts: webserver
   sudo: yes
   roles:
     - users
     - php
     - web
-    - databases
     - git
-    - selenium
     - orchestraCron
+- hosts: database
+  sudo: yes
+  roles:
+    - databases
+- hosts: test
+  sudo: yes
+  roles:
+    - selenium
     - jmeter
