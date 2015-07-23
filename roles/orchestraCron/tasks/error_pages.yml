@@ -1,0 +1,8 @@
+---
+  - name: generate error pages
+    cron: name="generate error pages"
+          minute={{error_pages_minute}}
+          hour={{error_pages_hour}}
+          job="{{error_pages_task}}"
+          user="{{cron_user}}"
+          cron_file="{{ cron_file }}"
