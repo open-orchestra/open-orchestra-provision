@@ -9,6 +9,11 @@ robots_hour: 2
 robots_task: '{{command_php}} {{path_front}}/app/console {{robots_command}} {{rm_stdout}}'
 robots_command: "-e={{env}} orchestra:robots:generate"
 
+error_pages_minute: 0
+error_pages_hour: 2
+error_pages_task: '{{command_php}} {{path_front}}/app/console {{error_pages_command}} {{rm_stdout}}'
+error_pages_command: "-e={{env}} orchestra:errorpages:generate"
+
 cron_file: open-orchestra
 cron_user: root
 rm_stdout: 1> /dev/null
