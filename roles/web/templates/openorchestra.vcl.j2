@@ -19,11 +19,30 @@ backend f{{ loop.index }} {
   .port = "{{ apache_main_port }}";
 }
 {% endfor %}
+{% for front_port in front_ports %}
+backend g{{ loop.index }} {
+  .host = "127.0.1.1";
+  .port = "{{ front_port }}";
+}
+{% endfor %}
+
+director back round-robin {
+{% for apache_main_port in apache_main_ports %}
+    {
+        .backend = f{{ loop.index }};
+    }
+{% endfor %}
+}
 
 director front round-robin {
 {% for apache_main_port in apache_main_ports %}
     {
         .backend = f{{ loop.index }};
+    }
+{% endfor %}
+{% for front_port in front_ports %}
+    {
+        .backend = g{{ loop.index }};
     }
 {% endfor %}
 }
@@ -89,6 +108,7 @@ sub vcl_recv {
                 elseif 
             {%- endif -%}
              (req.http.host ~ "({{ item.host }})") {
+                set req.backend = back;
 
                 return (pass);
             }
