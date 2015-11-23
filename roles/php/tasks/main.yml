@@ -10,3 +10,4 @@
 # - include: activate_redis_cli.yml
  - include: activate_mongo_cli.yml
  - include: php_cli_ini_set.yml
+ - include: install_avconv.yml
