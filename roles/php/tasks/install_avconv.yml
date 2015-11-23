@@ -1,0 +1,4 @@
+---
+- name: apt - install avconv
+  apt: name=libav-tools state=latest update-cache=yes cache_valid_time=3600
+
