@@ -177,7 +177,7 @@ sub vcl_hit {
         return (deliver);
     }
     // fetch & deliver once we get the result
-    return (miss);
+    return (deliver);
 }
 
 sub vcl_miss {
