@@ -11,6 +11,10 @@
   sudo: yes
   roles:
     - databases
+- hosts: indexation
+  sudo: yes
+  roles:
+    - achaussier.elasticsearch
 - hosts: test
   sudo: yes
   roles:
