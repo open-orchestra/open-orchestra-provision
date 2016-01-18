@@ -14,7 +14,7 @@
 - hosts: indexation
   sudo: yes
   roles:
-    - achaussier.elasticsearch
+    - clickfreak.elasticsearch
 - hosts: test
   sudo: yes
   roles:

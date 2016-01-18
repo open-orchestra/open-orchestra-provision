@@ -25,5 +25,5 @@
 - src: alban.andrieu.jmeter
   version: master
 
-- src: achaussier.elasticsearch
-  version: 0.1.1
+- src: clickfreak.elasticsearch
+  version: master
