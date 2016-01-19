@@ -24,3 +24,6 @@
 
 - src: alban.andrieu.jmeter
   version: master
+
+- src: clickfreak.elasticsearch
+  version: master
