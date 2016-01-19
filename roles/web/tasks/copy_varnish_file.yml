@@ -9,3 +9,7 @@
 - name: Copy Varnish configuration.
   template: src=varnish.j2 dest=/etc/default/varnish owner=root group=root mode=0755
   notify: restart varnish
+
+- name: Copy Varnish systemd file
+  template: src=varnish.service.j2 dest=/lib/systemd/system owner=root group=root mode=644
+  notify: restart varnish
