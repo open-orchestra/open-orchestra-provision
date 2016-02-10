@@ -32,6 +32,11 @@
             RewriteRule .? - [L]
 
             RewriteRule .? %{ENV:BASE}/app.php [L]
+
+            {% if item.value.siteId is defined %}
+            RewriteRule ^/sitemap.xml /{{ item.value.siteId }}/sitemap.xml [L]
+            RewriteRule ^/robots.txt /{{ item.value.siteId }}/robots.txt [L]
+            {% endif %}
         </IfModule>
 
         <IfModule !mod_rewrite.c>
@@ -41,14 +46,6 @@
         </IfModule>
 
     </Directory>
-
-    <IfModule mod_rewrite.c>
-        RewriteEngine On
-        {% if item.value.siteId is defined %}
-        RewriteRule ^/sitemap.xml /{{ item.value.siteId }}/sitemap.xml [L]
-        RewriteRule ^/robots.txt /{{ item.value.siteId }}/robots.txt [L]
-        {% endif %}
-    </IfModule>
 
     ErrorLog /var/log/apache2/{{ item.value.errorLog }}
 
