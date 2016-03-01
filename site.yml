@@ -15,8 +15,3 @@
   sudo: yes
   roles:
     - clickfreak.elasticsearch
-- hosts: test
-  sudo: yes
-  roles:
-    - selenium
-    - jmeter
