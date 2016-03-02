@@ -11,8 +11,3 @@
   sudo: yes
   roles:
     - databases
-- hosts: test
-  sudo: yes
-  roles:
-    - selenium
-    - jmeter
