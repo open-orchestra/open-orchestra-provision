@@ -1,9 +1,5 @@
-# This is a basic VCL configuration file for varnish.  See the vcl(7)
-# man page for details on VCL syntax and semantics.
-# 
-# Default backend definition.  Set this to point to your content
-# server.
-#
+# This is a basic Open Orchestra VCL configuration file for varnish 4.
+
 vcl 4.0;
 import directors;
 
@@ -17,14 +13,14 @@ acl invalidators {
 
 {% for apache_main_port in apache_main_ports %}
 backend f{{ loop.index }} {
-  .host = "127.0.1.1";
-  .port = "{{ apache_main_port }}";
+    .host = "127.0.1.1";
+    .port = "{{ apache_main_port }}";
 }
 {% endfor %}
 {% for back_port in back_ports %}
 backend g{{ loop.index }} {
-  .host = "127.0.1.1";
-  .port = "{{ back_port }}";
+    .host = "127.0.1.1";
+    .port = "{{ back_port }}";
 }
 {% endfor %}
 
@@ -39,7 +35,6 @@ sub vcl_init {
     front.add_backend(f{{ loop.index }});
 {% endfor %}
 }
-# Client side
 
 sub vcl_recv {
     set req.backend_hint = front.backend();
@@ -48,64 +43,30 @@ sub vcl_recv {
         set req.hash_always_miss = true;
     }
 
-    if (req.method == "BAN") {
-        if (!client.ip ~ invalidators) {
-             return (synth(405, "Ban not allowed"));
-        }
+    #=== Remove all cookies except the session ID ===#
+    if (req.http.Cookie) {
+        set req.http.Cookie = ";" + req.http.Cookie;
+        set req.http.Cookie = regsuball(req.http.Cookie, "; +", ";");
+        set req.http.Cookie = regsuball(req.http.Cookie, ";(PHPSESSID)=", "; \1=");
+        set req.http.Cookie = regsuball(req.http.Cookie, ";[^ ][^;]*", "");
+        set req.http.Cookie = regsuball(req.http.Cookie, "^[; ]+|[; ]+$", "");
 
-        if (req.http.X-Cache-Tags) {
-            ban("obj.http.X-Host ~ " + req.http.X-Host
-                + " && obj.http.X-Url ~ " + req.http.X-Url
-                + " && obj.http.content-type ~ " + req.http.X-Content-Type
-                + " && obj.http.X-Cache-Tags ~ " + req.http.X-Cache-Tags
-            );
-        } else {
-          ban("obj.http.X-Host ~ " + req.http.X-Host
-              + " && obj.http.X-Url ~ " + req.http.X-Url
-              + " && obj.http.content-type ~ " + req.http.X-Content-Type
-          );
-        }
-
-        return (synth(200, "Ban added"));
-    }
-
-    if (req.method == "PURGE") {
-        if (!client.ip ~ purgers) {
-             return (synth(405, "Purge not allowed"));
-        }
-        return(purge);
-    }
-     
-    if (req.method == "PRI") {
-        /* We do not support SPDY or HTTP/2.0 */
-        return (synth(405));
-    }
-    if (req.method != "GET" &&
-      req.method != "HEAD" &&
-      req.method != "PUT" &&
-      req.method != "POST" &&
-      req.method != "TRACE" &&
-      req.method != "OPTIONS" &&
-      req.method != "DELETE") {
-        /* Non-RFC2616 or CONNECT which is weird. */
-        return (pipe);
-    }
-    
-    
-    if (req.http.Accept-Encoding) {
-        if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
-            # No point in compressing these
-            unset req.http.Accept-Encoding;
-        } elsif (req.http.Accept-Encoding ~ "gzip") {
-            set req.http.Accept-Encoding = "gzip";
-        } elsif (req.http.Accept-Encoding ~ "deflate") {
-            set req.http.Accept-Encoding = "deflate";
-        } else {
-            # unknown algorithm
-            unset req.http.Accept-Encoding;
+        if (req.http.Cookie == "") {
+            unset req.http.Cookie;
         }
     }
 
+    #=== Add X-Forwarded-Port ===#
+    if (req.http.X-Forwarded-Proto == "https" ) {
+        set req.http.X-Forwarded-Port = "443";
+    } else {
+        set req.http.X-Forwarded-Port = "6081";
+    }
+
+    #=== Add Surrogate-Capability ===#
+    set req.http.Surrogate-Capability = "varnish=ESI/1.0";
+
+    #=== Pass when request for admin ===#
     {% for item in backend_conf %}
         {% if item.admin is defined and item.admin is sameas true %}
             {% if loop.first -%}
@@ -120,19 +81,74 @@ sub vcl_recv {
             }
         {% endif %}
     {% endfor %}
-    
+
+
+    #=== BAN request ===#
+    if (req.method == "BAN") {
+        if (!client.ip ~ invalidators) {
+            return (synth(405, "Ban not allowed"));
+        }
+
+        if (req.http.X-Cache-Tags) {
+            ban("obj.http.X-Host ~ " + req.http.X-Host
+                + " && obj.http.X-Url ~ " + req.http.X-Url
+                + " && obj.http.content-type ~ " + req.http.X-Content-Type
+                + " && obj.http.X-Cache-Tags ~ " + req.http.X-Cache-Tags
+            );
+        } else {
+            ban("obj.http.X-Host ~ " + req.http.X-Host
+                + " && obj.http.X-Url ~ " + req.http.X-Url
+                + " && obj.http.content-type ~ " + req.http.X-Content-Type
+            );
+        }
+
+        return (synth(200, "Ban added"));
+    }
+
+    #=== PURGE request ===#
+    if (req.method == "PURGE") {
+        if (!client.ip ~ purgers) {
+             return (synth(405, "Purge not allowed"));
+        }
+        return(purge);
+    }
+
+    #=== Normalize Accept-Encoding header ===#
+    if (req.http.Accept-Encoding) {
+        if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
+            unset req.http.Accept-Encoding;
+        } elsif (req.http.Accept-Encoding ~ "gzip") {
+            set req.http.Accept-Encoding = "gzip";
+        } elsif (req.http.Accept-Encoding ~ "deflate") {
+            set req.http.Accept-Encoding = "deflate";
+        } else {
+            unset req.http.Accept-Encoding;
+        }
+    }
+
+    #=== Normalize Accept-Encoding header ===#
+    if (req.http.Accept-Encoding) {
+        if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
+            unset req.http.Accept-Encoding;
+        } elsif (req.http.Accept-Encoding ~ "gzip") {
+            set req.http.Accept-Encoding = "gzip";
+        } elsif (req.http.Accept-Encoding ~ "deflate") {
+            set req.http.Accept-Encoding = "deflate";
+        } else {
+            unset req.http.Accept-Encoding;
+        }
+    }
+
+    #=== Pass when method different from GET and HEAD ===#
     if (req.method != "GET" && req.method != "HEAD") {
-        /* We only deal with GET and HEAD by default */
         return (pass);
     }
+
+    #=== Pass when request for preview ===#
     if (req.url ~ "^/preview") {
         return (pass);
     }
-    if (req.http.Authorization || req.http.Cookie) {
-        /* Not cacheable by default */
-        return (pass);
-    }
-    set req.http.Surrogate-Capability = "varnish=ESI/1.0";
+
     return (hash);
 }
 
@@ -151,14 +167,17 @@ sub vcl_pass {
 
 sub vcl_hash {
     hash_data(req.url);
+
     if (req.http.host) {
         hash_data(req.http.host);
     } else {
         hash_data(server.ip);
     }
+
     if (req.http.X-UA-Device) {
         hash_data(req.http.X-UA-Device);
     }
+
     return (lookup);
 }
 
@@ -171,11 +190,13 @@ sub vcl_hit {
         // A pure unadultered hit, deliver it
         return (deliver);
     }
+
     if (obj.ttl + obj.grace > 0s) {
         // Object is in grace, deliver it
         // Automatically triggers a background fetch
         return (deliver);
     }
+
     // fetch & deliver once we get the result
     return (fetch);
 }
@@ -192,6 +213,7 @@ sub vcl_deliver {
         unset resp.http.X-Host;
         unset resp.http.X-Cache-Tags;
     }
+
     return (deliver);
 }
 
@@ -216,6 +238,7 @@ sub vcl_synth {
   </body>
 </html>
 "} );
+
     return (deliver);
 }
 
@@ -234,6 +257,7 @@ sub vcl_backend_response {
     if (beresp.status == 404 || beresp.status == 500 || beresp.status == 503) {
         set beresp.ttl = 30s;
     }
+
     if (beresp.ttl <= 0s ||
       beresp.http.Surrogate-control ~ "no-store" ||
       (!beresp.http.Surrogate-Control &&
@@ -245,14 +269,16 @@ sub vcl_backend_response {
         set beresp.ttl = 120s;
         set beresp.uncacheable = true;
     }
-    
+
     if (beresp.http.Surrogate-Control ~ "ESI/1.0") {
         unset beresp.http.Surrogate-Control;
         set beresp.do_esi = true;
     }
+
     if (beresp.ttl>0s && !beresp.uncacheable) {
       unset beresp.http.Set-Cookie;
     }
+
     return (deliver);
 }
 
@@ -274,6 +300,7 @@ sub vcl_backend_error {
   </body>
 </html>
 "} );
+
     return (deliver);
 }
 
