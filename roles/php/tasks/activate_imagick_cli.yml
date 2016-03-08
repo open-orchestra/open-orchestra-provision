@@ -1,0 +1,7 @@
+---
+ - name: Check if file cli imagick exists
+   stat: path=/etc/php5/cli/conf.d/20-imagick.ini
+   register: cli_imagick
+ - name: Create a symbolic link imagick.ini
+   file: src=/etc/php5/mods-available/imagick.ini dest=/etc/php5/cli/conf.d/20-imagick.ini state=link
+   when: cli_imagick.stat.exists == false

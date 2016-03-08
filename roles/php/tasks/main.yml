@@ -5,9 +5,11 @@
  - include: copy_xdebug_ini.yml
 # - include: install_redis_extension.yml
  - include: install_mongo_extension.yml
+ - include: install_imagick_extension.yml
 # - include: activate_redis_apache.yml
  - include: activate_mongo_apache.yml
 # - include: activate_redis_cli.yml
  - include: activate_mongo_cli.yml
+ - include: activate_imagick_cli.yml
  - include: php_cli_ini_set.yml
  - include: install_avconv.yml
