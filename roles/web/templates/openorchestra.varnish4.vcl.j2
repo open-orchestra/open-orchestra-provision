@@ -43,6 +43,22 @@ sub vcl_recv {
         set req.hash_always_miss = true;
     }
 
+    #=== Pass when request for admin ===#
+    {% for item in backend_conf %}
+        {% if item.admin is defined and item.admin is sameas true %}
+            {% if loop.first -%}
+                if 
+            {%- else -%}
+                elseif 
+            {%- endif -%}
+             (req.http.host ~ "({{ item.host }})") {
+                set req.backend_hint = back.backend();
+
+                return (pass);
+            }
+        {% endif %}
+    {% endfor %}
+
     #=== Remove all cookies ===#
     unset req.http.Cookie;
 
@@ -70,23 +86,6 @@ sub vcl_recv {
 
     #=== Add Surrogate-Capability ===#
     set req.http.Surrogate-Capability = "varnish=ESI/1.0";
-
-    #=== Pass when request for admin ===#
-    {% for item in backend_conf %}
-        {% if item.admin is defined and item.admin is sameas true %}
-            {% if loop.first -%}
-                if 
-            {%- else -%}
-                elseif 
-            {%- endif -%}
-             (req.http.host ~ "({{ item.host }})") {
-                set req.backend_hint = back.backend();
-
-                return (pass);
-            }
-        {% endif %}
-    {% endfor %}
-
 
     #=== BAN request ===#
     if (req.method == "BAN") {
@@ -116,19 +115,6 @@ sub vcl_recv {
              return (synth(405, "Purge not allowed"));
         }
         return(purge);
-    }
-
-    #=== Normalize Accept-Encoding header ===#
-    if (req.http.Accept-Encoding) {
-        if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
-            unset req.http.Accept-Encoding;
-        } elsif (req.http.Accept-Encoding ~ "gzip") {
-            set req.http.Accept-Encoding = "gzip";
-        } elsif (req.http.Accept-Encoding ~ "deflate") {
-            set req.http.Accept-Encoding = "deflate";
-        } else {
-            unset req.http.Accept-Encoding;
-        }
     }
 
     #=== Normalize Accept-Encoding header ===#
