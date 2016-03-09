@@ -11,7 +11,8 @@ php_packages:
   - php5-dev
   - php5-fpm
   - php5-gd
-  - php5-imagick
+  - imagemagick
+  - libmagickwand-dev
 php_xdebug_module_path: /usr/lib/php5/20131226
 php_xdebug_remote_enable: true
 php_xdebug_remote_connect_back: 1

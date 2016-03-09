@@ -1,0 +1,12 @@
+---
+ - name: Install imagick extension
+   shell: printf "\n" | pecl install imagick
+   register: pecl_imagick_result
+   failed_when: pecl_imagick_result.rc > 1
+   changed_when: "'pecl/imagick is already installed' not in pecl_imagick_result.stdout"
+ - name: Check imagick conf file
+   stat: path=/etc/php5/mods-available/imagick.ini
+   register: imagick_conf
+ - name: Create the imagick extension
+   shell: echo "extension=imagick.so" > /etc/php5/mods-available/imagick.ini
+   when: imagick_conf.stat.exists == false
