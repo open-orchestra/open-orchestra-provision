@@ -13,9 +13,6 @@
 - src: JasonGiedymin.nodejs
   version: master
 
-- src: ThePixelDeveloper.google-chrome
-  version: master
-
 - src: kosssi.composer
   version: master
 
