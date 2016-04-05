@@ -59,6 +59,11 @@ sub vcl_recv {
         {% endif %}
     {% endfor %}
 
+    #=== Pass when request for preview ===#
+    if (req.url ~ "^/preview") {
+        return (pass);
+    }
+
     #=== Remove all cookies ===#
     unset req.http.Cookie;
 
@@ -132,11 +137,6 @@ sub vcl_recv {
 
     #=== Pass when method different from GET and HEAD ===#
     if (req.method != "GET" && req.method != "HEAD") {
-        return (pass);
-    }
-
-    #=== Pass when request for preview ===#
-    if (req.url ~ "^/preview") {
         return (pass);
     }
 
