@@ -64,24 +64,6 @@ sub vcl_recv {
         return (pass);
     }
 
-    #=== Remove all cookies ===#
-    unset req.http.Cookie;
-
-    #=== If you want to keep the session ID ===#
-    #=== Comment the previous line          ===#
-    #=== And uncomment the following block  ===#
-#    if (req.http.Cookie) {
-#        set req.http.Cookie = ";" + req.http.Cookie;
-#        set req.http.Cookie = regsuball(req.http.Cookie, "; +", ";");
-#        set req.http.Cookie = regsuball(req.http.Cookie, ";(PHPSESSID)=", "; \1=");
-#        set req.http.Cookie = regsuball(req.http.Cookie, ";[^ ][^;]*", "");
-#        set req.http.Cookie = regsuball(req.http.Cookie, "^[; ]+|[; ]+$", "");
-#
-#        if (req.http.Cookie == "") {
-#            unset req.http.Cookie;
-#        }
-#    }
-
     #=== Add X-Forwarded-Port ===#
     if (req.http.X-Forwarded-Proto == "https" ) {
         set req.http.X-Forwarded-Port = "443";
@@ -138,6 +120,24 @@ sub vcl_recv {
     #=== Pass when method different from GET and HEAD ===#
     if (req.method != "GET" && req.method != "HEAD") {
         return (pass);
+    }
+
+    #=== Remove all cookies ===#
+    # unset req.http.Cookie;
+
+    #=== If you want to keep the session ID ===#
+    #=== Comment the previous line          ===#
+    #=== And uncomment the following block  ===#
+    if (req.http.Cookie) {
+        set req.http.Cookie = ";" + req.http.Cookie;
+        set req.http.Cookie = regsuball(req.http.Cookie, "; +", ";");
+        set req.http.Cookie = regsuball(req.http.Cookie, ";(PHPSESSID)=", "; \1=");
+        set req.http.Cookie = regsuball(req.http.Cookie, ";[^ ][^;]*", "");
+        set req.http.Cookie = regsuball(req.http.Cookie, "^[; ]+|[; ]+$", "");
+
+        if (req.http.Cookie == "") {
+            unset req.http.Cookie;
+        }
     }
 
     return (hash);
