@@ -17,12 +17,12 @@ error_pages_command: "-e={{env}} orchestra:errorpages:generate"
 auto_publish_minute: 0
 auto_publish_hour: 2
 auto_publish_task: '{{command_php}} {{path_front}}/app/console {{auto_publish_command}} {{rm_stdout}}'
-auto_publish_command: "-e={{env}} orchestra:publish:nodes"
+auto_publish_command: "-e={{env}} orchestra:publish:node"
 
 auto_unpublish_minute: 30
 auto_unpublish_hour: 2
 auto_unpublish_task: '{{command_php}} {{path_front}}/app/console {{auto_unpublish_command}} {{rm_stdout}}'
-auto_unpublish_command: "-e={{env}} orchestra:unpublish:nodes"
+auto_unpublish_command: "-e={{env}} orchestra:unpublish:node"
 
 cron_file: open-orchestra
 cron_user: root
