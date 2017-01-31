@@ -1,0 +1,8 @@
+---
+  - name: Contents auto unpublishing
+    cron: name="Automatically unpublish contents"
+          minute={{auto_unpublish_content_minute}}
+          hour={{auto_unpublish_content_hour}}
+          job="{{auto_unpublish_content_task}}"
+          user="{{cron_user}}"
+          cron_file="{{ cron_file }}"

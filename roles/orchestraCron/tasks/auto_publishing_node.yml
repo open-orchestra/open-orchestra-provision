@@ -1,8 +1,8 @@
 ---
   - name: Nodes auto publishing
     cron: name="Automatically publish nodes"
-          minute={{auto_publish_minute}}
-          hour={{auto_publish_hour}}
-          job="{{auto_publish_task}}"
+          minute={{auto_publish_node_minute}}
+          hour={{auto_publish_node_hour}}
+          job="{{auto_publish_node_task}}"
           user="{{cron_user}}"
           cron_file="{{ cron_file }}"

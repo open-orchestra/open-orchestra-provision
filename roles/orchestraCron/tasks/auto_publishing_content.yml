@@ -1,0 +1,8 @@
+---
+  - name: Contents auto publishing
+    cron: name="Automatically publish contents"
+          minute={{auto_publish_content_minute}}
+          hour={{auto_publish_content_hour}}
+          job="{{auto_publish_content_task}}"
+          user="{{cron_user}}"
+          cron_file="{{ cron_file }}"

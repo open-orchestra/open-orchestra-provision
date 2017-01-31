@@ -1,8 +1,8 @@
 ---
   - name: Nodes auto unpublishing
     cron: name="Automatically unpublish nodes"
-          minute={{auto_unpublish_minute}}
-          hour={{auto_unpublish_hour}}
-          job="{{auto_unpublish_task}}"
+          minute={{auto_unpublish_node_minute}}
+          hour={{auto_unpublish_node_hour}}
+          job="{{auto_unpublish_node_task}}"
           user="{{cron_user}}"
           cron_file="{{ cron_file }}"
