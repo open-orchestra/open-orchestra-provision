@@ -4,25 +4,35 @@ sitemap_hour: 2
 sitemap_task: '{{command_php}} {{path_front}}/app/console {{sitemap_command}} {{rm_stdout}}'
 sitemap_command: "-e={{env}} orchestra:sitemaps:generate"
 
-robots_minute: 0
+robots_minute: 15
 robots_hour: 2
 robots_task: '{{command_php}} {{path_front}}/app/console {{robots_command}} {{rm_stdout}}'
 robots_command: "-e={{env}} orchestra:robots:generate"
 
-error_pages_minute: 0
+error_pages_minute: 30
 error_pages_hour: 2
 error_pages_task: '{{command_php}} {{path_front}}/app/console {{error_pages_command}} {{rm_stdout}}'
 error_pages_command: "-e={{env}} orchestra:errorpages:generate"
 
-auto_publish_minute: 0
-auto_publish_hour: 2
-auto_publish_task: '{{command_php}} {{path_front}}/app/console {{auto_publish_command}} {{rm_stdout}}'
-auto_publish_command: "-e={{env}} orchestra:publish:node"
+auto_publish_node_minute: 0
+auto_publish_node_hour: 3
+auto_publish_node_task: '{{command_php}} {{path_front}}/app/console {{auto_publish_node_command}} {{rm_stdout}}'
+auto_publish_node_command: "-e={{env}} orchestra:publish:node"
 
-auto_unpublish_minute: 30
-auto_unpublish_hour: 2
-auto_unpublish_task: '{{command_php}} {{path_front}}/app/console {{auto_unpublish_command}} {{rm_stdout}}'
-auto_unpublish_command: "-e={{env}} orchestra:unpublish:node"
+auto_unpublish_node_minute: 30
+auto_unpublish_node_hour: 3
+auto_unpublish_node_task: '{{command_php}} {{path_front}}/app/console {{auto_unpublish_node_command}} {{rm_stdout}}'
+auto_unpublish_node_command: "-e={{env}} orchestra:unpublish:node"
+
+auto_publish_content_minute: 0
+auto_publish_content_hour: 4
+auto_publish_content_task: '{{command_php}} {{path_front}}/app/console {{auto_publish_content_command}} {{rm_stdout}}'
+auto_publish_content_command: "-e={{env}} orchestra:publish:content"
+
+auto_unpublish_content_minute: 30
+auto_unpublish_content_hour: 4
+auto_unpublish_content_task: '{{command_php}} {{path_front}}/app/console {{auto_unpublish_content_command}} {{rm_stdout}}'
+auto_unpublish_content_command: "-e={{env}} orchestra:unpublish:content"
 
 cron_file: open-orchestra
 cron_user: root
